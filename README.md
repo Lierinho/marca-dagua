@@ -74,7 +74,7 @@ zeus dev
    zeus preview
    ```
 
-4. No app Zepp, vá em Perfil → Modo Desenvolvedor → Escanear e leia o QR code.
+4. No app Zepp, vá em **Dispositivos** → role até o final → **Geral** → **Modo desenvolvedor** → **+** → **Scan** e leia o QR code.
 
 > Se o `zeus preview` reclamar do `appId`, crie um app no console da Zepp e troque o `appId` em `app.json` pelo número gerado.
 
