@@ -1,0 +1,55 @@
+{
+  "configVersion": "v3",
+  "app": {
+    "appId": 1093256,
+    "appName": "Marca d'Água",
+    "appType": "app",
+    "version": {
+      "code": 1,
+      "name": "1.0.0"
+    },
+    "icon": "icon.png",
+    "vender": "matheusjsilveira",
+    "description": "Lembrete de água com timer que se repete sozinho"
+  },
+  "permissions": [
+    "data:os.device.info",
+    "device:os.local_storage",
+    "device:os.alarm",
+    "device:os.notification"
+  ],
+  "runtime": {
+    "apiVersion": {
+      "compatible": "3.0",
+      "target": "3.0",
+      "minVersion": "3.0"
+    }
+  },
+  "debug": false,
+  "targets": {
+    "gt": {
+      "module": {
+        "page": {
+          "pages": ["page/index", "page/settings"]
+        },
+        "app-service": {
+          "services": ["app-service/reminder"]
+        }
+      },
+      "platforms": [
+        { "st": "s" },
+        { "st": "r" }
+      ],
+      "designWidth": 480
+    }
+  },
+  "i18n": {
+    "pt-BR": {
+      "appName": "Marca d'Água"
+    },
+    "en-US": {
+      "appName": "Marca d'Água"
+    }
+  },
+  "defaultLanguage": "pt-BR"
+}
