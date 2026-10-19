@@ -17,7 +17,6 @@ const at = (day, h, m = 0) => new Date(2026, 9, day, h, m).getTime()
 const cfg = (over = {}) => ({
   intervalMin: 60,
   enabled: true,
-  anchor: 0,
   days: Array(7).fill(true),
   startMin: 480,
   endMin: 1320,
@@ -54,13 +53,15 @@ test('skips disabled weekdays', () => {
   assert.equal(f.at, at(26, 9))
 })
 
-test('anchor inside the window restarts the cycle', () => {
-  const anchor = at(19, 10, 25)
-  const f = nextFire(at(19, 10, 30), cfg({ anchor }))
-  assert.equal(f.at, at(19, 11, 25))
-  // The next day ignores the old anchor
-  const g = nextFire(at(20, 7), cfg({ anchor }))
-  assert.equal(g.at, at(20, 9))
+test('a 1.0 anchor is ignored: the grid always starts at the window start', () => {
+  const f = nextFire(at(19, 10, 30), cfg({ anchor: at(19, 10, 25) }))
+  assert.equal(f.at, at(19, 11))
+})
+
+test('changing the days keeps the running countdown', () => {
+  const before = nextFire(at(19, 10, 30), cfg())
+  const after = nextFire(at(19, 10, 30), cfg({ days: [false, true, true, true, true, true, false] }))
+  assert.deepEqual(after, before)
 })
 
 test('strictly after now, so a service firing on time gets the next slot', () => {
@@ -98,7 +99,6 @@ test('each weekday uses its own profile window', () => {
   const c = {
     intervalMin: 60,
     enabled: true,
-    anchor: 0,
     profiles: [
       { days: daysOf(MON, TUE, WED, THU, FRI), startMin: 480, endMin: 1320 },
       { days: daysOf(SAT, SUN), startMin: 600, endMin: 1200 },

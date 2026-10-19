@@ -7,7 +7,7 @@ import { W, PAD, ROW_H, GAP, TOP, COLOR, title, label, button, card, spacer } fr
 const CARD_ROW_H = 40
 
 // The list and the editor replace each other, so going back from either
-// returns straight to the settings page.
+// returns straight to the settings panel on the main page.
 function openProfile(index) {
   replace({ url: 'page/profile', params: String(index) })
 }

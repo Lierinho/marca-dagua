@@ -8,8 +8,9 @@
 //     startMin:  minutes after midnight when the reminder window opens
 //     endMin:    minutes after midnight when the window closes (max 1440)
 //   enabled:     master switch
-//   anchor:      ms timestamp of the last settings save; if it falls inside
-//                that day's window the cycle restarts from it
+//
+// Reminders sit on a fixed grid from each day's start time (start + k *
+// interval), so saving settings never restarts the countdown.
 
 const MINUTE = 60 * 1000
 const MAX_DAYS_AHEAD = 8
@@ -24,7 +25,6 @@ export const DEFAULT_CONFIG = {
   intervalMin: 60,
   profiles: [newProfile([true, true, true, true, true, true, true])],
   enabled: true,
-  anchor: 0,
 }
 
 // Accepts the current shape or the 1.0 shape (days/startMin/endMin at the
@@ -43,7 +43,6 @@ export function normalizeConfig(cfg) {
   return {
     intervalMin: src.intervalMin || DEFAULT_CONFIG.intervalMin,
     enabled: src.enabled !== undefined ? src.enabled : true,
-    anchor: src.anchor || 0,
     profiles: profiles.slice(0, MAX_PROFILES).map((p) => ({
       days: p.days.slice(),
       startMin: p.startMin,
@@ -97,9 +96,8 @@ export function nextFire(now, rawCfg) {
   for (let offset = 0; offset < MAX_DAYS_AHEAD; offset++) {
     const w = windowFor(now, offset, cfg)
     if (!w) continue
-    const base = cfg.anchor >= w.start && cfg.anchor <= w.end ? cfg.anchor : w.start
-    const k = now < base ? 1 : Math.floor((now - base) / interval) + 1
-    const at = base + k * interval
+    const k = now < w.start ? 1 : Math.floor((now - w.start) / interval) + 1
+    const at = w.start + k * interval
     if (at <= w.end) return { at, cycleStart: at - interval }
   }
   return null

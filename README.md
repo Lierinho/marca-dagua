@@ -9,16 +9,17 @@ Você escolhe um intervalo (ex.: 1 h) e o relógio avisa, vibra e **recomeça o 
 ## Como funciona
 
 - **Tela principal:** um círculo com água que vai **esvaziando** conforme o tempo passa (sem animação, atualiza a cada segundo), uma gota no centro e a contagem regressiva embaixo.
-- **Deslize de cima para baixo** (ou toque em "Ajustes") para configurar:
+- **Deslize para cima** e os ajustes sobem por baixo da tela (deslize para baixo para voltar):
   - **Intervalo:** de 5 min a 4 h, o mesmo para todos os perfis.
   - **Dias e horários:** uma caixa que abre a lista de perfis.
   - **Ligar/desligar** os avisos.
+  - **Salva sozinho**, cerca de 1,5 s depois do último toque.
 - **Perfis de dias e horários:** até 3 perfis, cada um com seus dias da semana e horário de início e fim (passos de 30 min).
   - O primeiro é o **padrão** e não pode ser excluído. Use **+ Novo perfil** para criar outros (ex.: um para Seg a Sex e outro para Sáb e Dom).
   - O nome é automático pelos dias escolhidos, como "Seg a Sex" ou "Ter e Qui".
   - **Cada dia fica em um só perfil:** ao ativar um dia que pertence a outro perfil (botão cinza), ele passa para o perfil atual.
 - **Aviso:** uma notificação "Hora de beber água!" com vibração. O próximo ciclo começa na hora, mesmo que você não veja o aviso.
-- **Mudanças nos ajustes:** o ciclo recomeça a partir do momento em que você salva. Nos dias seguintes, ele começa no horário de início.
+- **O cronômetro segue o horário do perfil:** os avisos caem sempre em início + intervalo, início + 2 × intervalo e assim por diante (ex.: 09:00, 10:00, 11:00 para início às 08:00 e intervalo de 1 h). Mudar dias ou horários não zera a contagem. Mudar o intervalo recalcula a grade a partir do início.
 
 ### Por dentro
 
@@ -27,10 +28,9 @@ Você escolhe um intervalo (ex.: 1 h) e o relógio avisa, vibra e **recomeça o 
 | `utils/schedule.js` | Lógica pura: calcula o próximo aviso pelos perfis (dias, janela de horário, intervalo). Tem testes. |
 | `utils/alarm.js` | Agenda um alarme único (`@zos/alarm`) que acorda o serviço. A configuração vai no `param` do alarme. |
 | `app-service/reminder.js` | Serviço sem tela: envia a notificação e agenda o próximo alarme (encadeado). |
-| `page/index.js` | Tela com o círculo de água. |
-| `page/settings.js` | Tela de ajustes. Salvar ou voltar já reagenda. |
+| `page/index.js` | Tela com o círculo de água e, deslizando para cima, o painel de ajustes (swiper vertical). |
 | `page/profiles.js` / `page/profile.js` | Lista de perfis e edição de um perfil. |
-| `utils/draft.js` | Cópia dos ajustes em edição, compartilhada entre as telas de ajustes. |
+| `utils/draft.js` | Cópia dos ajustes em edição, compartilhada entre as telas e salva automaticamente. |
 | `utils/ui.js` | Botões, linhas "- valor +" e caixas reaproveitados nas telas. |
 | `scripts/gen-icons.mjs` | Gera o ícone e a gota em PNG, sem dependências. |
 

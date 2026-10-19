@@ -5,8 +5,8 @@
     "appName": "Marca d'Água",
     "appType": "app",
     "version": {
-      "code": 2,
-      "name": "1.1.0"
+      "code": 3,
+      "name": "1.2.0"
     },
     "icon": "icon.png",
     "vender": "matheusjsilveira",
@@ -30,7 +30,7 @@
     "gt": {
       "module": {
         "page": {
-          "pages": ["page/index", "page/settings", "page/profiles", "page/profile"]
+          "pages": ["page/index", "page/profiles", "page/profile"]
         },
         "app-service": {
           "services": ["app-service/reminder"]
