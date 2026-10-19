@@ -8,12 +8,15 @@ Você escolhe um intervalo (ex.: 1 h) e o relógio avisa, vibra e **recomeça o 
 
 ## Como funciona
 
-- **Tela principal:** um círculo com água que vai **esvaziando** até a hora de beber, uma gota no centro e a contagem regressiva embaixo.
-- **Deslize para cima** (ou toque em "Ajustes") para configurar:
-  - **Intervalo:** de 5 min a 4 h.
-  - **Dias da semana:** D S T Q Q S S (azul = ativo).
-  - **Início e fim dos avisos:** em passos de 30 min.
+- **Tela principal:** um círculo com água que vai **esvaziando** conforme o tempo passa (sem animação, atualiza a cada segundo), uma gota no centro e a contagem regressiva embaixo.
+- **Deslize de cima para baixo** (ou toque em "Ajustes") para configurar:
+  - **Intervalo:** de 5 min a 4 h, o mesmo para todos os perfis.
+  - **Dias e horários:** uma caixa que abre a lista de perfis.
   - **Ligar/desligar** os avisos.
+- **Perfis de dias e horários:** até 3 perfis, cada um com seus dias da semana e horário de início e fim (passos de 30 min).
+  - O primeiro é o **padrão** e não pode ser excluído. Use **+ Novo perfil** para criar outros (ex.: um para Seg a Sex e outro para Sáb e Dom).
+  - O nome é automático pelos dias escolhidos, como "Seg a Sex" ou "Ter e Qui".
+  - **Cada dia fica em um só perfil:** ao ativar um dia que pertence a outro perfil (botão cinza), ele passa para o perfil atual.
 - **Aviso:** uma notificação "Hora de beber água!" com vibração. O próximo ciclo começa na hora, mesmo que você não veja o aviso.
 - **Mudanças nos ajustes:** o ciclo recomeça a partir do momento em que você salva. Nos dias seguintes, ele começa no horário de início.
 
@@ -21,18 +24,21 @@ Você escolhe um intervalo (ex.: 1 h) e o relógio avisa, vibra e **recomeça o 
 
 | Arquivo | Função |
 |---|---|
-| `utils/schedule.js` | Lógica pura: calcula o próximo aviso (janela de horário, dias, intervalo). Tem testes. |
+| `utils/schedule.js` | Lógica pura: calcula o próximo aviso pelos perfis (dias, janela de horário, intervalo). Tem testes. |
 | `utils/alarm.js` | Agenda um alarme único (`@zos/alarm`) que acorda o serviço. A configuração vai no `param` do alarme. |
 | `app-service/reminder.js` | Serviço sem tela: envia a notificação e agenda o próximo alarme (encadeado). |
-| `page/index.js` | Tela com o círculo de água (animação só com o app aberto). |
+| `page/index.js` | Tela com o círculo de água. |
 | `page/settings.js` | Tela de ajustes. Salvar ou voltar já reagenda. |
+| `page/profiles.js` / `page/profile.js` | Lista de perfis e edição de um perfil. |
+| `utils/draft.js` | Cópia dos ajustes em edição, compartilhada entre as telas de ajustes. |
+| `utils/ui.js` | Botões, linhas "- valor +" e caixas reaproveitados nas telas. |
 | `scripts/gen-icons.mjs` | Gera o ícone e a gota em PNG, sem dependências. |
 
 Ao abrir o app, o alarme é sempre reagendado. Se a corrente de alarmes quebrar por algum motivo (por exemplo, relógio desligado), abrir o app conserta.
 
 ## Limitações
 
-- A animação só roda com o app aberto. Em segundo plano roda apenas o alarme, o que economiza bateria.
+- O desenho da água só é atualizado com o app aberto. Em segundo plano roda apenas o alarme, o que economiza bateria.
 - Nos modos **Não Perturbe** e **sono**, o sistema pode silenciar a vibração.
 - Os horários de início e fim são do mesmo dia (não atravessam a meia-noite).
 

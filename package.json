@@ -1,6 +1,6 @@
 {
   "name": "marca-dagua",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Lembrete de água para Amazfit Bip Max (Zepp OS)",
   "main": "app.js",
   "scripts": {

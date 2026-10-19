@@ -42,13 +42,28 @@ function encodePng(w, h, rgba) {
   ])
 }
 
-// Drop = circle at the bottom + a tapering point on top.
-function inDrop(x, y, d) {
-  const dx = x - d.cx
-  if (dx * dx + (y - d.cy) ** 2 <= d.r * d.r) return true
-  if (y < d.tip || y > d.cy) return false
-  const t = (y - d.tip) / (d.cy - d.tip)
-  return Math.abs(dx) <= d.r * Math.pow(t, 0.75)
+// Teardrop curve: x = sin(t) * sin(t/2), y = -cos(t), t in [0, pi].
+// Smooth all round, with a pointed tip on top and a round belly below.
+const DROP_MAX_HW = 0.7698 // max of sin(t) * sin(t/2), at sin²(t/2) = 2/3
+
+// `d` is the drop's bounding box { x, y, w, h }; returns local coords or null.
+function dropLocal(x, y, d) {
+  const v = ((y - d.y) / d.h) * 2 - 1
+  if (v < -1 || v > 1) return null
+  const t = Math.acos(-v)
+  const hw = (Math.sin(t) * Math.sin(t / 2)) / DROP_MAX_HW
+  const u = (x - (d.x + d.w / 2)) / (d.w / 2)
+  return Math.abs(u) <= hw ? { u, v } : null
+}
+
+// Soft 3D look: bright top-left, slightly blue towards the lower right,
+// plus a small curved highlight.
+function dropShade(p, base, shadow, highlight) {
+  const hx = p.u + 0.35
+  const hy = p.v - 0.45
+  if (hx * hx * 6 + hy * hy * 1.4 < 0.06 && p.u < -0.1) return highlight
+  const t = Math.min(1, Math.max(0, (p.u + 1) * 0.3 + (p.v + 1) * 0.2))
+  return mix(base, shadow, t)
 }
 
 function inCircle(x, y, c) {
@@ -87,35 +102,34 @@ function mix(c1, c2, t) {
 }
 
 const WHITE = [255, 255, 255, 255]
-const LIGHT = [205, 232, 255, 255]
+const ICE = [190, 222, 255, 255]
 const BLUE_TOP = [72, 168, 255, 255]
 const BLUE_BOTTOM = [16, 96, 214, 255]
 
-// App icon: blue gradient disc with a white drop.
+// App icon: blue gradient disc with the white drop.
 function appIcon(size) {
   const bg = { cx: size / 2, cy: size / 2, r: size / 2 }
-  const drop = { cx: size / 2, cy: size * 0.6, r: size * 0.22, tip: size * 0.18 }
-  const shine = { cx: size * 0.43, cy: size * 0.62, r: size * 0.06 }
+  const drop = { x: size * 0.31, y: size * 0.17, w: size * 0.38, h: size * 0.64 }
   return render(size, size, (x, y) => {
     if (!inCircle(x, y, bg)) return null
-    if (inDrop(x, y, drop)) return inCircle(x, y, shine) ? LIGHT : WHITE
+    const p = dropLocal(x, y, drop)
+    if (p) return dropShade(p, WHITE, ICE, WHITE)
     return mix(BLUE_TOP, BLUE_BOTTOM, y / size)
   })
 }
 
-// In-app drop: white drop with a soft highlight, sits on top of the water.
+// In-app drop: same shape, sits in the middle of the water circle.
 function inAppDrop(w, h) {
-  const drop = { cx: w / 2, cy: h * 0.64, r: w * 0.4, tip: h * 0.04 }
-  const shine = { cx: w * 0.38, cy: h * 0.68, r: w * 0.1 }
+  const drop = { x: 1, y: 1, w: w - 2, h: h - 2 }
   return render(w, h, (x, y) => {
-    if (!inDrop(x, y, drop)) return null
-    return inCircle(x, y, shine) ? LIGHT : [255, 255, 255, 235]
+    const p = dropLocal(x, y, drop)
+    return p ? dropShade(p, WHITE, ICE, WHITE) : null
   })
 }
 
 const ICON = 248
-const DROP_W = 96
-const DROP_H = 120
+const DROP_W = 100
+const DROP_H = 128
 
 for (const target of ['assets/gt.s', 'assets/gt.r']) {
   mkdirSync(target, { recursive: true })
